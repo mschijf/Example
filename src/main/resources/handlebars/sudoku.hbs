@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <style>
+            .grid-container {
+                display: grid;
+                grid-template-columns: 600px auto;
+                background-color: black;
+                padding: 10px;
+            }
+            .grid-item {
+                background-color: white;
+                border: 1px solid black;
+                padding: 20px;
+                text-align: center;
+            }
+            .square {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: white;
+                color: black;
+                width: 60px;
+                height: 60px;
+                font-size: 24px;
+            }
+            .bigsquare {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: white;
+                color: black;
+                width: 180px;
+                height: 180px;
+                font-size: 24px;
+            }
+            .tableborder {
+                border-collapse: collapse;
+                border: 1px solid black;
+                background-color: black;
+            }
+
+            .tableleft {
+                text-align: left;    .
+            }
+        </style>
+    </head>
+
+<!--    flexcontainer-->
+
+    <body onload="getBoard()">
+        <div class="grid-container">
+            <div class="grid-item">
+                <table class="tableborder">
+                    {{#each fields}}
+                    <tr>
+                        {{#each this}}
+                        <td><div id="field{{this.col}}{{this.row}}" class="square"></div></td>
+                        {{/each}}
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            <div class="grid-item">
+            </div>
+            <div class="grid-item">
+                <table>
+                    <tr>
+                        <td><button id="buttonNew" onclick="newGame()">New game</button></td>
+                        <td><button id="buttonCompute" onclick="computeMove()">Compute</button></td>
+                        <td><button id="buttonTakeback" onclick="takebackLastMove()">Take Back</button></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="grid-item">
+{{!--                 <table class="table2"> --}}
+{{!--                     <tr> --}}
+{{!--                         <td class="tableleft"><b>Evaluation value:</b></td> --}}
+{{!--                         <td class="tableleft" id="evaluationValue"></td> --}}
+{{!--                     </tr> --}}
+{{!--                     <tr> --}}
+{{!--                         <td class="tableleft"><b>Computer Move:</b></td> --}}
+{{!--                         <td class="tableleft" id="computerMove"></td> --}}
+{{!--                     </tr> --}}
+{{!--                     <tr> --}}
+{{!--                         <td class="tableleft"><b>Nodes:</b></td> --}}
+{{!--                         <td class="tableleft" id="nodesCount"></td> --}}
+{{!--                     </tr> --}}
+{{!--                     <tr> --}}
+{{!--                         <td class="tableleft"><b>Time (ms):</b></td> --}}
+{{!--                         <td class="tableleft" id="timeSpend"></td> --}}
+{{!--                     </tr> --}}
+{{!--                     <tr> --}}
+{{!--                         <td class="tableleft"><b>Nodes/sec:</b></td> --}}
+{{!--                         <td class="tableleft" id="nodesPerSecond"></td> --}}
+{{!--                     </tr> --}}
+{{!--                 </table> --}}
+            </div>
+        </div>
+
+        <script>
+            function toFieldId(col, row) {
+                //return "field" + col + "" + row
+                return `field${col}${row}`
+            }
+
+            function showBoard(board) {
+                showFields(board)
+                showActionButtons(board)
+//                 showComputerResult(board.searchResult)
+//                 showMiscellanious(board)
+            }
+
+            function showFields(board) {
+                for (let row = 0; row < board.fields.length; row++) {
+                    for (let col = 0; col < board.fields[row].length; col++) {
+                        var elem = document.getElementById(toFieldId(col, row));
+                        elem.innerText=board.fields[row][col].value
+                        if (board.fields[row][col].lastSquarePlayed) {
+                            elem.style.backgroundColor = "red"
+                        } else {
+                            elem.style.backgroundColor = "white"
+                        }
+                    }
+                }
+            }
+
+            function showMiscellanious(board) {
+                document.getElementById("boardId").innerText = board.boardString;
+            }
+
+            function disableAllButtons() {
+                document.getElementById("buttonCompute").disabled = true
+                document.getElementById("buttonTakeback").disabled = true
+            }
+
+            function showActionButtons(board) {
+                document.getElementById("buttonCompute").disabled = !board.computePossible
+                document.getElementById("buttonTakeback").disabled = !board.takeBackPossible
+            }
+
+            function showComputerResult(searchResult) {
+                if (searchResult != null) {
+                    s = ""
+                    for (let i = 0; i < searchResult.moveSequence.length; i++) {
+                        if (i > 0) {
+                            s = s + "-"
+                        }
+                        s = s + String.fromCharCode(97 + searchResult.moveSequence[i].col) + String.fromCharCode(48 + searchResult.moveSequence[i].row + 1)
+                    }
+                    document.getElementById("computerMove").innerText = s
+                    document.getElementById("evaluationValue").innerText = searchResult.evaluationValue
+                    document.getElementById("nodesCount").innerText = numberWithCommas(searchResult.nodesVisited)
+                    document.getElementById("timeSpend").innerText = numberWithCommas(searchResult.durationMillis)
+                    document.getElementById("nodesPerSecond").innerText = numberWithCommas(searchResult.nodesPerSecond)
+                } else {
+                    document.getElementById("computerMove").innerText = ""
+                    document.getElementById("evaluationValue").innerText = ""
+                    document.getElementById("nodesCount").innerText = ""
+                    document.getElementById("timeSpend").innerText = ""
+                    document.getElementById("nodesPerSecond").innerText = ""
+                }
+            }
+        </script>
+
+
+        <script>
+            function executeMove(columnNumber) {
+                var request = new XMLHttpRequest();
+                request.open("POST", "c4api/v1/move/" + columnNumber);
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var board = JSON.parse(this.responseText);
+                        showBoard(board);
+                        var useComputer = document.getElementById("useComputerPlayer").checked
+                        if (!board.gameFinished && useComputer) {
+                            computeMove()
+                        }
+                    }
+                };
+                request.send();
+            }
+
+            function takebackLastMove() {
+                var request = new XMLHttpRequest();
+                request.open("POST", "c4api/v1/move/takeback/");
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var board = JSON.parse(this.responseText);
+                        showBoard(board);
+                    }
+                };
+                request.send();
+            }
+
+            function computeMove() {
+                disableAllButtons()
+                var request = new XMLHttpRequest();
+                request.open("POST", "c4api/v1/move/compute/");
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var board = JSON.parse(this.responseText);
+                        showBoard(board);
+                    }
+                };
+                request.send();
+            }
+
+            function getBoard() {
+                var request = new XMLHttpRequest();
+
+                request.open("GET", "c4api/v1/board/");
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var board = JSON.parse(this.responseText);
+                        showBoard(board);
+                    }
+                };
+                request.send();
+            }
+
+            // const fetchBoardAsync = () => {
+                // mdn fetch
+                // return fetch('/board/', {
+                    // method: 'GET'
+                    // headers:
+                // }).then(response => response).then
+            // }
+
+            // const getBoardAsync = async () => {
+            //     const response = await fetchBoardAsync();
+            //     console.log(response);
+            //     // ...
+            // }
+
+
+
+
+            function newGame() {
+                var request = new XMLHttpRequest();
+                request.open("POST", "c4api/v1/board/");
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var board = JSON.parse(this.responseText);
+                        showBoard(board);
+                    }
+                };
+                request.send();
+            }
+        </script>
+
+
+    </body>
+</html>
