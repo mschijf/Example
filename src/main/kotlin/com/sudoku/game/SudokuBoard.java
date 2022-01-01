@@ -13,7 +13,7 @@ public class SudokuBoard {
 	Vector<SudokuTuple> allTuples;
 	Stack<SudokuSolutionStep> solutions;
 
-	private static final int[] emptySquares = {
+	private static final int[] easySquares = {
 			0,0,0, 0,0,0, 0,8,0,
 			6,8,0, 4,7,0, 0,2,0,
 			0,1,9, 5,0,8, 6,4,7,
@@ -27,8 +27,36 @@ public class SudokuBoard {
 			0,0,3, 8,9,1, 5,0,0
 	};
 
+	private static final int[] difficultSquares = {
+			0,0,7, 0,0,0, 9,0,0,
+			0,0,0, 0,1,0, 4,7,2,
+			0,0,4, 0,8,0, 0,0,0,
+
+			0,6,0, 9,0,0, 0,1,0,
+			0,0,0, 0,0,0, 0,3,0,
+			0,9,0, 6,0,3, 0,0,0,
+
+			1,0,0, 7,0,8, 0,0,0,
+			7,0,0, 0,0,6, 0,0,0,
+			3,0,0, 0,0,0, 0,8,5,
+	};
+
+	private static final int[] emptySquares = {
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+			0,0,0, 0,0,0, 0,0,0,
+	};
+
 	public SudokuBoard() {
-		this(emptySquares);
+		this(difficultSquares);
 	}
 
 	public SudokuBoard(int[] intSquares) {
@@ -151,7 +179,7 @@ public class SudokuBoard {
 	//==============================================================================
 
 	private SudokuSolutionStep getSolutionFollowingRule1() {
-		for (int r=0; r<9; r++) { 
+		for (int r=0; r<9; r++) {
 			for (int c=0; c<9; c++) {
 				SudokuSquare sq = allSquares[r][c]; 
 				if (sq.hasExactlyOnePossibleValue()) {
