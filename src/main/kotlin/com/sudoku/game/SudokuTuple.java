@@ -20,22 +20,33 @@ public class SudokuTuple {
 	}
 
 	public SudokuSolutionStep findSolvableSquare() {
-		SudokuSquare sq;
-		
 		for (int i=1; i<=9; ++i) {
-			Iterator<SudokuSquare> it = squareSet.iterator();
-			sq = null;
-			boolean goOn = true;
-			while (it.hasNext() && goOn) {
-				SudokuSquare tmpSq=it.next();
+			SudokuSquare sq = null;
+			for (SudokuSquare tmpSq: squareSet) {
 				if (tmpSq.isPossibleValue(i)) {
-					if (sq == null)
+					if (sq == null) {
 						sq = tmpSq;
-					else
-						goOn = false;
+					} else {
+						sq = null;
+						break;
+					}
 				}
 			}
-			if (goOn && sq != null)
+
+//			Iterator<SudokuSquare> it = squareSet.iterator();
+//			sq = null;
+//			boolean goOn = true;
+//			while (it.hasNext() && goOn) {
+//				SudokuSquare tmpSq=it.next();
+//				if (tmpSq.isPossibleValue(i)) {
+//					if (sq == null)
+//						sq = tmpSq;
+//					else
+//						goOn = false;
+//				}
+//			}
+//			if (goOn && sq != null)
+			if (sq != null)
 				return new SudokuSolutionStep(sq, i);
 		}
 		return null;

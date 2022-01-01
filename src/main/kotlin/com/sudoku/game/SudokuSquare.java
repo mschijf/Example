@@ -8,70 +8,53 @@ public class SudokuSquare {
 	private int	theValue;
 	
 	public SudokuSquare() {
-		theValue=0;
-		possibleValues = new HashSet<Integer>();
-		
-		initPossibilities();
-		
+		possibleValues = new HashSet<>();
 		tuples = new HashSet<SudokuTuple>();
+
+		theValue=0;
+		initPossibilities();
 	}
 	
 	public void addTuple(SudokuTuple aTuple) {
 		tuples.add(aTuple);
 	}
-	
-	
-	public void updatePossibleValues(int aValue) {	
-		possibleValues.remove(new Integer(aValue));
+
+	public void updatePossibleValues(int aValue) {
+		possibleValues.remove(aValue);
 	}
-	
-	
+
 	public void setValue(int aValue) {
 		theValue = aValue;
 		recalcPossibilities() ;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean hasExactlyOnePossibleValue() {
 		return (possibleValues.size() == 1);
 	}
 	
-	/**
-	 * 
-	 * @return
-	 */
 	public int getPossibleValue() {
-		return possibleValues.iterator().next().intValue();
+		return possibleValues.stream().findFirst().get();
 	}
 
-	/**
-	 * 
-	 * @param aValue
-	 * @return
-	 */
 	public boolean isPossibleValue(int aValue) {
-		return possibleValues.contains(new Integer(aValue));
+		return possibleValues.contains(aValue);
 	}
 
 	public int getAcceptedValue() {
 		return theValue;
 	}
-	
 
 	public String possibilityString() {
-		String s = "";
+		StringBuilder s = new StringBuilder();
 		for (Integer v: possibleValues)
-			s = s + v.toString() + " ";
-		return s;
+			s.append(v + " ");
+		return s.toString();
 	}
 
 	public void initPossibilities() {
 		possibleValues.clear();
 		for (int i=1; i<=9; ++i) 
-			possibleValues.add(new Integer(i));
+			possibleValues.add(i);
 	}
 
 	public void recalcPossibilities() {
