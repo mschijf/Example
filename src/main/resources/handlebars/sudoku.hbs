@@ -5,12 +5,12 @@
             .grid-container {
                 display: grid;
                 grid-template-columns: 600px auto;
-                background-color: black;
+                background-color: white;
                 padding: 10px;
             }
             .grid-item {
                 background-color: white;
-                border: 1px solid black;
+                border: 0px solid blue;
                 padding: 20px;
                 text-align: center;
             }
@@ -24,20 +24,10 @@
                 height: 60px;
                 font-size: 24px;
             }
-            .bigsquare {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                background-color: white;
-                color: black;
-                width: 180px;
-                height: 180px;
-                font-size: 24px;
-            }
             .tableborder {
                 border-collapse: collapse;
                 border: 1px solid black;
-                background-color: black;
+                background-color: lightgrey;
             }
 
             .tableleft {
@@ -69,64 +59,55 @@
                         <td><button id="buttonNew" onclick="newGame()">New game</button></td>
                         <td><button id="buttonCompute" onclick="computeMove()">Compute</button></td>
                         <td><button id="buttonTakeback" onclick="takebackLastMove()">Take Back</button></td>
+                        <td><input unchecked type="checkbox" id="showHints" name="showHints" value="showHints" onclick="getBoard()"><label for="showHints">Show hints</label></td>
                     </tr>
                 </table>
             </div>
             <div class="grid-item">
-{{!--                 <table class="table2"> --}}
-{{!--                     <tr> --}}
-{{!--                         <td class="tableleft"><b>Evaluation value:</b></td> --}}
-{{!--                         <td class="tableleft" id="evaluationValue"></td> --}}
-{{!--                     </tr> --}}
-{{!--                     <tr> --}}
-{{!--                         <td class="tableleft"><b>Computer Move:</b></td> --}}
-{{!--                         <td class="tableleft" id="computerMove"></td> --}}
-{{!--                     </tr> --}}
-{{!--                     <tr> --}}
-{{!--                         <td class="tableleft"><b>Nodes:</b></td> --}}
-{{!--                         <td class="tableleft" id="nodesCount"></td> --}}
-{{!--                     </tr> --}}
-{{!--                     <tr> --}}
-{{!--                         <td class="tableleft"><b>Time (ms):</b></td> --}}
-{{!--                         <td class="tableleft" id="timeSpend"></td> --}}
-{{!--                     </tr> --}}
-{{!--                     <tr> --}}
-{{!--                         <td class="tableleft"><b>Nodes/sec:</b></td> --}}
-{{!--                         <td class="tableleft" id="nodesPerSecond"></td> --}}
-{{!--                     </tr> --}}
-{{!--                 </table> --}}
             </div>
         </div>
 
         <script>
             function toFieldId(col, row) {
-                //return "field" + col + "" + row
                 return `field${col}${row}`
             }
 
             function showBoard(board) {
                 showFields(board)
                 showActionButtons(board)
-//                 showComputerResult(board.searchResult)
-//                 showMiscellanious(board)
+//                 showInfo(board)
+            }
+
+            function setSquareBackground(sq, field) {
+                if (field.lastSquarePlayed) {
+                    sq.style.backgroundColor = "red"
+                } else if (  ((Math.floor(field.row/3) + Math.floor(field.col/3)) % 2) == 1) {
+                    sq.style.backgroundColor = "#F0F0F0"
+                } else {
+                    sq.style.backgroundColor = "white"
+                }
             }
 
             function showFields(board) {
                 for (let row = 0; row < board.fields.length; row++) {
                     for (let col = 0; col < board.fields[row].length; col++) {
                         var elem = document.getElementById(toFieldId(col, row));
-                        elem.innerText=board.fields[row][col].value
-                        if (board.fields[row][col].lastSquarePlayed) {
-                            elem.style.backgroundColor = "red"
+                        var showHints = document.getElementById("showHints").checked
+
+                        if (board.fields[row][col].value != "") {
+                            elem.style.fontSize = "x-large"
+                            elem.style.fontWeight = "bold"
+                            elem.innerText= board.fields[row][col].value
+                        } else if (showHints) {
+                            elem.style.fontSize = "small"
+                            elem.style.fontWeight = "lighter"
+                            elem.innerText = board.fields[row][col].possibilitiesList
                         } else {
-                            elem.style.backgroundColor = "white"
+                            elem.innerText = ""
                         }
+                        setSquareBackground(elem, board.fields[row][col])
                     }
                 }
-            }
-
-            function showMiscellanious(board) {
-                document.getElementById("boardId").innerText = board.boardString;
             }
 
             function disableAllButtons() {
@@ -139,26 +120,12 @@
                 document.getElementById("buttonTakeback").disabled = !board.takeBackPossible
             }
 
-            function showComputerResult(searchResult) {
-                if (searchResult != null) {
-                    s = ""
-                    for (let i = 0; i < searchResult.moveSequence.length; i++) {
-                        if (i > 0) {
-                            s = s + "-"
-                        }
-                        s = s + String.fromCharCode(97 + searchResult.moveSequence[i].col) + String.fromCharCode(48 + searchResult.moveSequence[i].row + 1)
-                    }
-                    document.getElementById("computerMove").innerText = s
-                    document.getElementById("evaluationValue").innerText = searchResult.evaluationValue
-                    document.getElementById("nodesCount").innerText = numberWithCommas(searchResult.nodesVisited)
-                    document.getElementById("timeSpend").innerText = numberWithCommas(searchResult.durationMillis)
-                    document.getElementById("nodesPerSecond").innerText = numberWithCommas(searchResult.nodesPerSecond)
+            function showInfo(board) {
+                document.getElementById("solutionCount").innerText = board.solutionCount;
+                if (!board.legal) {
+                    document.getElementById("legalMessage").innerText = "Illegal position!"
                 } else {
-                    document.getElementById("computerMove").innerText = ""
-                    document.getElementById("evaluationValue").innerText = ""
-                    document.getElementById("nodesCount").innerText = ""
-                    document.getElementById("timeSpend").innerText = ""
-                    document.getElementById("nodesPerSecond").innerText = ""
+                    document.getElementById("legalMessage").innerText = ""
                 }
             }
         </script>

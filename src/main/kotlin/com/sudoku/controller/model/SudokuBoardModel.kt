@@ -7,7 +7,10 @@ import com.sudoku.game.SudokuBoard.MAX_ROW
 class SudokuBoardModel(private val board: SudokuBoard)  {
     val numberOfRows = MAX_ROW
     val numberOfColumns = MAX_COL
-    val fields = Array(MAX_ROW) { row -> Array(MAX_COL) { col -> FieldModel(col, row, squareToString(col, row), board.isLastSquarePlayed(row, col)) } }
+    val fields = Array(MAX_ROW) {
+            row -> Array(MAX_COL) {
+            col -> FieldModel(col, row, squareToString(col, row), board.isLastSquarePlayed(row, col), board.getSquarePossibleValueString(row, col))
+            } }
     val takeBackPossible = board.canUndo()
     val computePossible = board.hasSolutionStep()
 
@@ -19,4 +22,4 @@ class SudokuBoardModel(private val board: SudokuBoard)  {
 }
 
 
-data class FieldModel(val col: Int, val row: Int, val value: String, val lastSquarePlayed: Boolean)
+data class FieldModel(val col: Int, val row: Int, val value: String, val lastSquarePlayed: Boolean, val possibilitiesList:String)

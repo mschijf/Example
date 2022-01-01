@@ -98,32 +98,19 @@ public class SudokuBoard {
 	//==============================================================================
 
 	public boolean isLegal() {
-		if (allTuples == null) 
+		if (allTuples == null)
 			return false;
-		
-		for (SudokuTuple tuple: allTuples) 
-			if (tuple.illegal()) 
+
+		for (SudokuTuple tuple: allTuples)
+			if (tuple.illegal())
 				return false;
 		if (this.countAllPossibilities(true) != 1)
 			return false;
 		return true;
 	}
+
 	//==============================================================================
 
-	/**
-	 * 
-	 * @return
-	 */
-	public int maxSquares() {
-		return allSquares.length;
-	}
-
-	/**
-	 * 
-	 * @param row
-	 * @param col
-	 * @return
-	 */
 	public boolean isLastSquarePlayed(int row, int col) {
 		if (solutions.isEmpty())
 			return false;
@@ -157,22 +144,12 @@ public class SudokuBoard {
 		return !solutions.isEmpty();
 	}
 	
-	/**
-	 * 
-	 * @param row
-	 * @param col
-	 * @return
-	 */
 	public int getSquareValue(int row, int col) {
 		return allSquares[row][col].getAcceptedValue();
 	}
 	
 	//==============================================================================
 
-	/**
-	 * 
-	 * @return
-	 */
 	private SudokuSolutionStep getSolutionFollowingRule1() {
 		for (int r=0; r<9; r++) { 
 			for (int c=0; c<9; c++) {
@@ -186,10 +163,6 @@ public class SudokuBoard {
 		return null;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	private SudokuSolutionStep getSolutionFollowingRule2() {
 		for (SudokuTuple tuple:allTuples) {
 			SudokuSolutionStep step = tuple.findSolvableSquare();
@@ -229,9 +202,6 @@ public class SudokuBoard {
 		solution.getSquare().setValue(solution.getValue());
 	}
 	
-	/**
-	 * 
-	 */
 	public SudokuSolutionStep calculatePossibleField() {
 		SudokuSolutionStep solution = getSimpleSolutionStep();
 		if (solution == null) 
@@ -242,12 +212,7 @@ public class SudokuBoard {
 		return solution;
 	}
 
-	/**
-	 * 
-	 * @return
-	 */
 	public boolean hasSolutionStep() {
-		//return (getSolutionStep() != null);
 		return (!illegal() && !finished());
 	}
 	
