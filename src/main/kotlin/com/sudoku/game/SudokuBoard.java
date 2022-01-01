@@ -210,7 +210,7 @@ public class SudokuBoard {
 	}
 	
 	private SudokuSolutionStep getComplexSolutionStep() {
-		SudokuSquare sq = mostPromisingSquare();
+		SudokuSquare sq = getMostPromisingSquare();
 		HashSet<Integer> localSet = new HashSet<>(sq.getPossibleValueSet());
 		for (int val: localSet) {		
 			executeSolution(new SudokuSolutionStep(sq, val));
@@ -258,9 +258,9 @@ public class SudokuBoard {
 		return false;
 	}
 	
-	private SudokuSquare mostPromisingSquare() {
+	private SudokuSquare getMostPromisingSquare() {
 		int minCnt = 9999;
-		SudokuSquare mpSquare = null;
+		SudokuSquare mostPromisingSquare = null;
 		
 		for (SudokuSquare[] row: allSquares) { 
 			for (SudokuSquare square: row) { 
@@ -268,13 +268,13 @@ public class SudokuBoard {
 					int n = square.getPossibleValueSet().size();
 					if (n < minCnt) {
 						minCnt = n;
-						mpSquare = square;
+						mostPromisingSquare = square;
 					}
 				}
 			}
 		}
 		
-		return mpSquare;
+		return mostPromisingSquare;
 	}
 
 	public int countAllPossibilities(boolean quick) {
@@ -292,7 +292,7 @@ public class SudokuBoard {
 			return cnt;
 		}
 		
-		SudokuSquare sq = mostPromisingSquare();
+		SudokuSquare sq = getMostPromisingSquare();
 		if (sq == null)
 			return 0;
 		
