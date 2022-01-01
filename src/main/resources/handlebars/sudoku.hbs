@@ -61,6 +61,11 @@
                         <td><button id="buttonTakeback" onclick="takebackLastMove()">Take Back</button></td>
                         <td><input unchecked type="checkbox" id="showHints" name="showHints" value="showHints" onclick="getBoard()"><label for="showHints">Show hints</label></td>
                     </tr>
+                        <td><button id="buttonCalculateAll" onclick="getInfo()">Calculate All Solutions</button></td>
+                        <td>Solutions: </td>
+                        <td id="solutionCount"></td>
+                    <tr>
+                    </tr>
                 </table>
             </div>
             <div class="grid-item">
@@ -75,7 +80,6 @@
             function showBoard(board) {
                 showFields(board)
                 showActionButtons(board)
-//                 showInfo(board)
             }
 
             function setSquareBackground(sq, field) {
@@ -120,13 +124,13 @@
                 document.getElementById("buttonTakeback").disabled = !board.takeBackPossible
             }
 
-            function showInfo(board) {
-                document.getElementById("solutionCount").innerText = board.solutionCount;
-                if (!board.legal) {
-                    document.getElementById("legalMessage").innerText = "Illegal position!"
-                } else {
-                    document.getElementById("legalMessage").innerText = ""
-                }
+            function showInfo(info) {
+                document.getElementById("solutionCount").innerText = info.solutionCount
+//                 if (!info.legal) {
+//                     document.getElementById("legalMessage").innerText = "Illegal position!"
+//                 } else {
+//                     document.getElementById("legalMessage").innerText = ""
+//                 }
             }
         </script>
 
@@ -134,7 +138,7 @@
         <script>
             function executeMove(columnNumber) {
                 var request = new XMLHttpRequest();
-                request.open("POST", "c4api/v1/move/" + columnNumber);
+                request.open("POST", "sudoku/v1/move/" + columnNumber);
                 request.onreadystatechange = function() {
                     if(this.readyState === 4 && this.status === 200) {
                         var board = JSON.parse(this.responseText);
@@ -150,7 +154,7 @@
 
             function takebackLastMove() {
                 var request = new XMLHttpRequest();
-                request.open("POST", "c4api/v1/move/takeback/");
+                request.open("POST", "sudoku/v1/move/takeback/");
                 request.onreadystatechange = function() {
                     if(this.readyState === 4 && this.status === 200) {
                         var board = JSON.parse(this.responseText);
@@ -163,7 +167,7 @@
             function computeMove() {
                 disableAllButtons()
                 var request = new XMLHttpRequest();
-                request.open("POST", "c4api/v1/move/compute/");
+                request.open("POST", "sudoku/v1/move/compute/");
                 request.onreadystatechange = function() {
                     if(this.readyState === 4 && this.status === 200) {
                         var board = JSON.parse(this.responseText);
@@ -176,7 +180,7 @@
             function getBoard() {
                 var request = new XMLHttpRequest();
 
-                request.open("GET", "c4api/v1/board/");
+                request.open("GET", "sudoku/v1/board/");
                 request.onreadystatechange = function() {
                     if(this.readyState === 4 && this.status === 200) {
                         var board = JSON.parse(this.responseText);
@@ -202,11 +206,23 @@
 
             function newGame() {
                 var request = new XMLHttpRequest();
-                request.open("POST", "c4api/v1/board/");
+                request.open("POST", "sudoku/v1/board/");
                 request.onreadystatechange = function() {
                     if(this.readyState === 4 && this.status === 200) {
                         var board = JSON.parse(this.responseText);
                         showBoard(board);
+                    }
+                };
+                request.send();
+            }
+
+            function getInfo() {
+                var request = new XMLHttpRequest();
+                request.open("GET", "sudoku/v1/board/info/");
+                request.onreadystatechange = function() {
+                    if(this.readyState === 4 && this.status === 200) {
+                        var info = JSON.parse(this.responseText);
+                        showInfo(info);
                     }
                 };
                 request.send();

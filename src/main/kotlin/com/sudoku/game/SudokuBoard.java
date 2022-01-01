@@ -1,16 +1,16 @@
 
 package com.sudoku.game;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Stack;
-import java.util.Vector;
 
 public class SudokuBoard {
 	public static final int MAX_ROW = 9;
 	public static final int MAX_COL = 9;
 
 	SudokuSquare [][] allSquares;
-	Vector<SudokuTuple> allTuples;
+	ArrayList<SudokuTuple> allTuples;
 	Stack<SudokuSolutionStep> solutions;
 
 	private static final int[] easySquares = {
@@ -60,9 +60,9 @@ public class SudokuBoard {
 	}
 
 	public SudokuBoard(int[] intSquares) {
-		allTuples = new Vector<SudokuTuple>();
+		allTuples = new ArrayList<>();
 		allSquares = new SudokuSquare[9][9];
-		solutions = new Stack<SudokuSolutionStep>();
+		solutions = new Stack<>();
 		
 		//create the squares
 		for (int r=0; r<9; r++) 
@@ -132,9 +132,7 @@ public class SudokuBoard {
 		for (SudokuTuple tuple: allTuples)
 			if (tuple.illegal())
 				return false;
-		if (this.countAllPossibilities(true) != 1)
-			return false;
-		return true;
+		return this.countAllPossibilities(true) == 1;
 	}
 
 	//==============================================================================
@@ -213,7 +211,7 @@ public class SudokuBoard {
 	
 	private SudokuSolutionStep getComplexSolutionStep() {
 		SudokuSquare sq = mostPromisingSquare();
-		HashSet<Integer> localSet = new HashSet<Integer>(sq.getPossibleValueSet());		
+		HashSet<Integer> localSet = new HashSet<>(sq.getPossibleValueSet());
 		for (int val: localSet) {		
 			executeSolution(new SudokuSolutionStep(sq, val));
 			int cnt = countAllPossibilities(true);
@@ -235,8 +233,6 @@ public class SudokuBoard {
 		if (solution == null) 
 			solution = getComplexSolutionStep();
 
-		if (solution == null)
-			return null;
 		return solution;
 	}
 
@@ -300,7 +296,7 @@ public class SudokuBoard {
 		if (sq == null)
 			return 0;
 		
-		HashSet<Integer> localSet = new HashSet<Integer>(sq.getPossibleValueSet());		
+		HashSet<Integer> localSet = new HashSet<>(sq.getPossibleValueSet());
 		for (int val: localSet) {
 			executeSolution(new SudokuSolutionStep(sq, val));
 			cnt = cnt + countAllPossibilities(quick);

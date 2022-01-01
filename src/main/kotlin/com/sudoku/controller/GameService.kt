@@ -1,6 +1,7 @@
 package com.sudoku.controller
 
 import com.sudoku.controller.model.SudokuBoardModel
+import com.sudoku.controller.model.SudokuInfoModel
 import com.sudoku.game.SudokuBoard
 import org.springframework.stereotype.Service
 
@@ -26,5 +27,9 @@ class GameService {
         val sudokuSolutionStep = board.calculatePossibleField()
         board.executeSolution(sudokuSolutionStep)
         return SudokuBoardModel(board)
+    }
+
+    fun calculateAllSolutions() : SudokuInfoModel {
+        return SudokuInfoModel(board.countAllPossibilities(false))
     }
 }

@@ -1,12 +1,12 @@
 package com.sudoku.controller
 
 import com.sudoku.controller.model.SudokuBoardModel
+import com.sudoku.controller.model.SudokuInfoModel
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletResponse
 
-const val BOARD_COOKIE = "BOARDSTATUS"
-const val REQUESTPATH_BASE = "c4api/v1"
+const val REQUESTPATH_BASE = "sudoku/v1"
 
 @RestController
 @RequestMapping(REQUESTPATH_BASE)
@@ -30,6 +30,11 @@ class SudokuController @Autowired constructor(private val gameService: GameServi
     @PostMapping("/move/compute/")
     fun computeAndExecuteNextMove(httpServletResponse: HttpServletResponse): SudokuBoardModel {
         return gameService.computeAndExecuteNextMove()
+    }
+
+    @GetMapping("/board/info/")
+    fun getInfo(httpServletResponse: HttpServletResponse): SudokuInfoModel {
+        return gameService.calculateAllSolutions()
     }
 }
 
